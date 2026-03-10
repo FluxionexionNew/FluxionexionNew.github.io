@@ -3,150 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BedrockTiers | PvP Verification</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>🔥 BEDROCKTIERS | PvP SYSTEM</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="bedrock" id="bedrockApp">
+    <div class="app">
         <!-- ШАПКА -->
         <div class="header">
             <div class="logo">BEDROCK<span>TIERS</span></div>
-            <div class="header-buttons">
-                <div class="online-count" id="onlineCount">0 ONLINE</div>
-                <div class="admin-badge" id="adminBadge" style="display: none;">👑 АДМИН</div>
-                <div class="verification-badge" id="verificationBadge" style="display: none;">⏳ НА ПРОВЕРКЕ</div>
-            </div>
+            <div class="online-count" id="onlineCount">0 ONLINE</div>
         </div>
 
         <!-- ВКЛАДКИ -->
         <div class="tabs">
-            <div class="tab active" data-tab="login">🔐 ВХОД</div>
-            <div class="tab" data-tab="register">📝 РЕГИСТРАЦИЯ</div>
-            <div class="tab" data-tab="leaderboard">🏆 ТОП</div>
+            <div class="tab active" onclick="showTab('login')">🔐 ВХОД</div>
+            <div class="tab" onclick="showTab('register')">📝 РЕГА</div>
+            <div class="tab" onclick="showTab('leaderboard')">🏆 ТОП</div>
         </div>
 
         <!-- ВХОД -->
-        <div id="loginSection" class="section active">
-            <div class="section-title">🔐 ВХОД В АККАУНТ</div>
-            
-            <div class="input-group">
-                <div class="input-label">НИКНЕЙМ</div>
-                <input type="text" id="loginUsername" class="input-field" placeholder="Введите ник">
-            </div>
-            
-            <div class="input-group">
-                <div class="input-label">ПАРОЛЬ</div>
-                <input type="password" id="loginPassword" class="input-field" placeholder="••••••••">
-            </div>
-            
-            <button class="action-btn" id="loginBtn">🔓 ВОЙТИ</button>
-            <div id="loginMessage" class="message"></div>
+        <div id="login" class="section active">
+            <h2 class="section-title">🔐 ВХОД</h2>
+            <input type="text" id="loginUser" class="input" placeholder="Никнейм">
+            <input type="password" id="loginPass" class="input" placeholder="Пароль">
+            <button class="btn" onclick="login()">ВОЙТИ</button>
+            <div id="loginMsg" class="msg"></div>
         </div>
 
         <!-- РЕГИСТРАЦИЯ -->
-        <div id="registerSection" class="section">
-            <div class="section-title">📝 РЕГИСТРАЦИЯ</div>
+        <div id="register" class="section">
+            <h2 class="section-title">📝 РЕГИСТРАЦИЯ</h2>
+            <input type="text" id="regUser" class="input" placeholder="Никнейм">
+            <input type="password" id="regPass" class="input" placeholder="Пароль">
+            <input type="password" id="regConfirm" class="input" placeholder="Повтори пароль">
             
-            <div class="input-group">
-                <div class="input-label">НИКНЕЙМ</div>
-                <input type="text" id="regUsername" class="input-field" placeholder="Введите ник">
+            <div class="cats">
+                <div class="cat selected" onclick="selectCat('Sword')">⚔️ SWORD</div>
+                <div class="cat" onclick="selectCat('Axe')">🪓 AXE</div>
+                <div class="cat" onclick="selectCat('Crystal')">💎 CRYSTAL</div>
+                <div class="cat" onclick="selectCat('Mace')">🔨 MACE</div>
             </div>
             
-            <div class="input-group">
-                <div class="input-label">ПАРОЛЬ</div>
-                <input type="password" id="regPassword" class="input-field" placeholder="••••••••">
-            </div>
-            
-            <div class="input-group">
-                <div class="input-label">ПОВТОРИТЕ ПАРОЛЬ</div>
-                <input type="password" id="regConfirm" class="input-field" placeholder="••••••••">
-            </div>
-            
-            <div class="input-label">ОСНОВНАЯ КАТЕГОРИЯ</div>
-            <div class="pvp-categories" id="pvpCategories">
-                <div class="pvp-cat selected" data-cat="Sword">⚔️ SWORD</div>
-                <div class="pvp-cat" data-cat="Axe">🪓 AXE</div>
-                <div class="pvp-cat" data-cat="Crystal">💎 CRYSTAL</div>
-                <div class="pvp-cat" data-cat="Mace">🔨 MACE</div>
-            </div>
-            
-            <button class="action-btn" id="registerBtn">✅ СОЗДАТЬ АККАУНТ</button>
-            <div id="registerMessage" class="message"></div>
+            <button class="btn" onclick="register()">СОЗДАТЬ</button>
+            <div id="regMsg" class="msg"></div>
         </div>
 
         <!-- ЛИДЕРБОРД -->
-        <div id="leaderboardSection" class="section">
-            <div class="section-title">🏆 ТОП ИГРОКОВ</div>
+        <div id="leaderboard" class="section">
+            <h2 class="section-title">🏆 ТОП ИГРОКОВ</h2>
             
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Поиск игрока...">
+            <input type="text" id="searchInput" class="input" placeholder="🔍 Поиск..." oninput="updateLeaderboard()">
+            
+            <div class="filters">
+                <div class="filter active" onclick="filterLeaderboard('all')">ВСЕ</div>
+                <div class="filter" onclick="filterLeaderboard('Sword')">⚔️ SWORD</div>
+                <div class="filter" onclick="filterLeaderboard('Axe')">🪓 AXE</div>
+                <div class="filter" onclick="filterLeaderboard('Crystal')">💎 CRYSTAL</div>
+                <div class="filter" onclick="filterLeaderboard('Mace')">🔨 MACE</div>
             </div>
-            
-            <div class="leaderboard-filters">
-                <div class="filter-btn active" data-filter="all">ВСЕ</div>
-                <div class="filter-btn" data-filter="Sword">⚔️ SWORD</div>
-                <div class="filter-btn" data-filter="Axe">🪓 AXE</div>
-                <div class="filter-btn" data-filter="Crystal">💎 CRYSTAL</div>
-                <div class="filter-btn" data-filter="Mace">🔨 MACE</div>
+
+            <div class="stats">
+                <div>🏆 ТОП 1: <span id="topElo">0</span> ELO</div>
+                <div>👥 ВСЕГО: <span id="totalPlayers">0</span></div>
             </div>
-            
-            <div class="leaderboard-stats">
-                <div>🏆 ТОП 1: <span id="top1Elo">0</span> ELO</div>
-                <div>📊 ВСЕГО: <span id="totalPlayers">0</span></div>
-            </div>
-            
-            <div class="leaderboard" id="leaderboard"></div>
+
+            <div id="playersList"></div>
         </div>
 
-        <!-- ПРОФИЛЬ -->
-        <div id="profileSection" class="section" style="display: none;">
+        <!-- ПРОФИЛЬ (после входа) -->
+        <div id="profile" class="section">
             <div class="profile-header">
-                <div class="avatar-container">
-                    <div class="avatar-preview" id="avatarPreview">
-                        <span id="avatarEmoji">👤</span>
-                        <img id="avatarImage" style="display: none;">
-                    </div>
-                    <div class="avatar-upload" id="avatarUploadBtn">
-                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
-                        <span>✏️</span>
-                    </div>
+                <div class="avatar">
+                    <span id="avatarEmoji">👤</span>
                 </div>
                 <div class="profile-info">
                     <h2 id="profileName">Игрок</h2>
-                    <div class="profile-badges">
-                        <span class="profile-category" id="profileCategory">Sword</span>
-                        <span class="profile-rank" id="profileRank">Новичок</span>
+                    <div class="badges">
+                        <span class="badge cat-badge" id="profileCat">Sword</span>
+                        <span class="badge rank-badge" id="profileRank">Новичок</span>
                     </div>
                 </div>
                 <div class="profile-elo">
-                    <div class="elo-label">ELO</div>
                     <div class="elo-value" id="profileElo">1000</div>
                 </div>
             </div>
 
-            <!-- Статус верификации -->
-            <div class="verification-status" id="verificationStatus" style="display: none;">
-                <div class="status-icon">⏳</div>
-                <div class="status-text">Видео на проверке</div>
-                <div class="status-small">Ждите решения админа</div>
-            </div>
-
-            <!-- Прогресс звания -->
-            <div class="rank-card">
-                <div class="rank-info">
-                    <span id="currentRankTitle">Новичок</span>
-                    <span>→</span>
-                    <span id="nextRankTitle">Воин</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="rankProgress" style="width: 0%"></div>
-                </div>
-                <div class="progress-stats">
-                    <span id="currentElo">1000</span> / <span id="nextRankElo">1200</span> ELO
-                </div>
-            </div>
-
-            <!-- Статистика -->
+            <!-- СТАТИСТИКА В 3 КОЛОНКИ (ИСПРАВЛЕНО) -->
             <div class="stats-grid">
                 <div class="stat-item">
                     <div class="stat-value" id="playerWins">0</div>
@@ -162,119 +104,88 @@
                 </div>
             </div>
 
-            <!-- Кнопки действий -->
+            <!-- Прогресс звания -->
+            <div class="progress-card">
+                <div class="progress-info">
+                    <span id="currentRank">Новичок</span>
+                    <span>→</span>
+                    <span id="nextRank">Воин</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="rankProgress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="currentElo">1000</span> / <span id="needElo">1200</span> ELO
+                </div>
+            </div>
+
+            <!-- КНОПКИ С ОТСТУПАМИ (ИСПРАВЛЕНО) -->
             <div class="action-buttons">
-                <button class="action-btn" id="calibrateBtn">⚡ ЗАГРУЗИТЬ ВИДЕО</button>
-                <button class="action-btn logout-btn" id="logoutBtn">🚪 ВЫЙТИ</button>
+                <button class="btn" onclick="showVideoUpload()">🎥 ЗАГРУЗИТЬ ВИДЕО</button>
+                <button class="btn logout" onclick="logout()">🚪 ВЫЙТИ</button>
             </div>
         </div>
 
         <!-- ЗАГРУЗКА ВИДЕО -->
-        <div id="videoUploadSection" class="section" style="display: none;">
-            <div class="section-title">⚡ ЗАГРУЗКА ВИДЕО</div>
+        <div id="videoUpload" class="section">
+            <h2 class="section-title">🎥 ЗАГРУЗКА ВИДЕО</h2>
             
-            <div class="info-box">
-                <div class="info-icon">🎥</div>
-                <div class="info-text">Загрузи видео с твоим PvP</div>
-                <div class="info-small">Админ проверит и назначит тир</div>
-            </div>
-
-            <div class="input-label">ВЫБЕРИ ОРУЖИЕ</div>
-            <div class="weapon-selector" id="videoWeaponSelector">
-                <div class="weapon-option selected" data-weapon="Sword">⚔️ Sword</div>
-                <div class="weapon-option" data-weapon="Axe">🪓 Axe</div>
-                <div class="weapon-option" data-weapon="Crystal">💎 Crystal</div>
-                <div class="weapon-option" data-weapon="Mace">🔨 Mace</div>
-            </div>
-
-            <div class="upload-area" id="videoUploadArea">
+            <div class="upload-area" onclick="document.getElementById('videoFile').click()">
                 <div class="upload-icon">📹</div>
-                <div class="upload-text">Нажми чтобы загрузить видео</div>
-                <input type="file" id="videoFileInput" accept="video/*" style="display: none;">
+                <div class="upload-text">Нажми чтобы выбрать видео</div>
+            </div>
+            
+            <input type="file" id="videoFile" accept="video/*" style="display: none;" onchange="handleVideoSelect(this)">
+            
+            <div class="cats" style="margin: 15px 0;">
+                <div class="cat selected" onclick="selectVideoWeapon('Sword')">⚔️ SWORD</div>
+                <div class="cat" onclick="selectVideoWeapon('Axe')">🪓 AXE</div>
+                <div class="cat" onclick="selectVideoWeapon('Crystal')">💎 CRYSTAL</div>
+                <div class="cat" onclick="selectVideoWeapon('Mace')">🔨 MACE</div>
             </div>
 
-            <div id="videoUploadProgress" style="display: none;">
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="videoProgressBar" style="width: 0%;"></div>
+            <div id="videoProgress" style="display: none;">
+                <div class="progress-bar" style="margin: 15px 0;">
+                    <div class="progress-fill" id="videoProgressBar" style="width: 0%"></div>
                 </div>
-                <div class="progress-text" id="videoProgressText">0%</div>
+                <div id="videoProgressText" style="color: #00ffff; text-align: center;">0%</div>
             </div>
 
-            <button class="action-btn" id="submitVideoBtn" disabled>📤 ОТПРАВИТЬ НА ПРОВЕРКУ</button>
-            <button class="action-btn back-btn" id="backFromVideo">◀ НАЗАД</button>
+            <div class="action-buttons">
+                <button class="btn" id="submitVideoBtn" onclick="submitVideo()" disabled>📤 ОТПРАВИТЬ</button>
+                <button class="btn back" onclick="backToProfile()">◀ НАЗАД</button>
+            </div>
         </div>
 
-        <!-- АДМИН ПАНЕЛЬ (верификация видео) -->
-        <div id="adminSection" class="section" style="display: none;">
-            <div class="section-title">👑 АДМИН ПАНЕЛЬ</div>
+        <!-- АДМИНКА -->
+        <div id="admin" class="section">
+            <h2 class="section-title">👑 АДМИН ПАНЕЛЬ</h2>
             
             <div class="admin-stats">
                 <div class="admin-stat">
-                    <div class="stat-value" id="adminTotalUsers">0</div>
-                    <div class="stat-label">ИГРОКОВ</div>
+                    <div id="adminUsersCount">0</div>
+                    <div>ИГРОКОВ</div>
                 </div>
                 <div class="admin-stat">
-                    <div class="stat-value" id="adminPendingVideos">0</div>
-                    <div class="stat-label">НА ПРОВЕРКЕ</div>
+                    <div id="adminVideosCount">0</div>
+                    <div>ВИДЕО</div>
                 </div>
             </div>
 
-            <!-- Вкладки админки -->
-            <div class="admin-tabs">
-                <div class="admin-tab active" data-admin-tab="videos">🎥 ВИДЕО</div>
-                <div class="admin-tab" data-admin-tab="users">👥 ИГРОКИ</div>
-                <div class="admin-tab" data-admin-tab="settings">⚙️ НАСТРОЙКИ</div>
-            </div>
-
-            <!-- Видео на проверке -->
-            <div id="adminVideosTab" class="admin-tab-content active">
-                <div class="pending-videos" id="pendingVideos">
-                    <!-- Сюда будут добавляться видео -->
-                </div>
-            </div>
-
-            <!-- Управление игроками -->
-            <div id="adminUsersTab" class="admin-tab-content">
-                <div class="admin-search">
-                    <input type="text" id="adminUserSearch" placeholder="🔍 Поиск игрока...">
-                </div>
-                <div class="admin-users-list" id="adminUsersList"></div>
-            </div>
-
-            <!-- Настройки -->
-            <div id="adminSettingsTab" class="admin-tab-content">
-                <div class="settings-group">
-                    <div class="settings-title">⚙️ ОСНОВНЫЕ</div>
-                    <button class="admin-btn" id="adminResetAll">🔄 СБРОСИТЬ ВСЁ</button>
-                    <button class="admin-btn" id="adminClearData">🗑️ ОЧИСТИТЬ ДАННЫЕ</button>
-                    <button class="admin-btn" id="adminExport">📥 ЭКСПОРТ</button>
-                </div>
-                
-                <div class="settings-group">
-                    <div class="settings-title">🎯 НАСТРОЙКИ ТИРОВ</div>
-                    <div class="setting-item">
-                        <label>HT1 (3000+ ELO)</label>
-                        <input type="number" id="settingHT1" value="3000" class="setting-input">
-                    </div>
-                    <div class="setting-item">
-                        <label>HT2 (2700-2999)</label>
-                        <input type="number" id="settingHT2" value="2700" class="setting-input">
-                    </div>
-                    <div class="setting-item">
-                        <label>ТОП 550 (2400 ELO)</label>
-                        <input type="number" id="settingTop550" value="2400" class="setting-input">
-                    </div>
-                </div>
+            <div id="videosList"></div>
+            
+            <div class="action-buttons">
+                <button class="btn back" onclick="backToProfile()">◀ НАЗАД</button>
             </div>
         </div>
 
         <!-- ФУТЕР -->
         <div class="footer">
             <div>© 2026 BEDROCKTIERS</div>
-            <div>v6.0 • ВЕРИФИКАЦИЯ</div>
+            <div>v2.0</div>
         </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <script src="script.js"></script>
 </body>
-    </html>
+                                                       </html>
