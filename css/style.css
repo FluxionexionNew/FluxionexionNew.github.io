@@ -1,443 +1,294 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
+/* Дополнительные стили для верификации */
 
-body {
-    background: #0a0c15;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 15px;
-}
-
-.bedrock {
-    width: 100%;
-    max-width: 500px;
-    background: #141a24;
-    border-radius: 30px;
-    border: 1px solid #00ffff;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-    overflow: hidden;
-}
-
-/* Шапка */
-.header {
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #00ffff20;
-    background: #0f151f;
-}
-
-.logo {
-    font-size: 24px;
-    font-weight: 900;
-    color: #00ffff;
-}
-
-.logo span {
+.verification-badge {
+    background: #ffaa0020;
+    border: 1px solid #ffaa00;
     color: #ffaa00;
-}
-
-.online-count {
-    background: #00ffff10;
-    border: 1px solid #00ffff;
-    color: #00ffff;
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 12px;
 }
 
-/* Секции */
-.section {
-    padding: 20px;
+.verification-status {
+    background: #ffaa0010;
+    border: 1px solid #ffaa00;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.status-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.status-text {
+    color: #ffaa00;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.status-small {
+    color: #8f9bb5;
+    font-size: 12px;
+}
+
+/* Админ панель */
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
     border-bottom: 1px solid #00ffff20;
 }
 
-.section-title {
-    color: #00ffff;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-
-/* Формы */
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-label {
-    color: #8f9bb5;
-    font-size: 12px;
-    margin-bottom: 5px;
-}
-
-.input-field {
-    width: 100%;
-    background: #0f151f;
-    border: 1px solid #00ffff40;
-    border-radius: 12px;
-    padding: 14px;
-    color: white;
-    font-size: 15px;
-    outline: none;
-}
-
-.input-field:focus {
-    border-color: #00ffff;
-}
-
-.pvp-categories {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin: 15px 0;
-}
-
-.pvp-cat {
-    background: #0f151f;
-    border: 1px solid #00ffff40;
-    border-radius: 10px;
-    padding: 10px 5px;
-    text-align: center;
+.admin-tab {
+    padding: 10px 15px;
     color: #8f9bb5;
     cursor: pointer;
-    font-size: 12px;
-}
-
-.pvp-cat.selected {
-    background: #00ffff20;
-    border-color: #00ffff;
-    color: #00ffff;
-}
-
-/* Кнопки */
-.register-btn, .analyze-btn, .continue-btn {
-    width: 100%;
-    background: #00ffff;
-    border: none;
-    border-radius: 12px;
-    padding: 16px;
-    color: #000;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.analyze-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Профиль */
-.profile-section {
-    background: #0f151f;
-}
-
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.avatar-container {
-    position: relative;
-    width: 70px;
-    height: 70px;
-}
-
-.avatar-preview {
-    width: 100%;
-    height: 100%;
-    border-radius: 20px;
-    background: #1a2538;
-    border: 2px solid #00ffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 35px;
-    overflow: hidden;
-}
-
-.avatar-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.avatar-upload {
-    position: absolute;
-    bottom: -5px;
-    right: -5px;
-    width: 28px;
-    height: 28px;
-    background: #00ffff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #000;
-    font-size: 14px;
-}
-
-.profile-info h2 {
-    color: white;
-    font-size: 20px;
-    margin-bottom: 5px;
-}
-
-.profile-badges {
-    display: flex;
-    gap: 8px;
-}
-
-.profile-category, .profile-rank {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
 }
 
-.profile-category {
-    background: #00ffff20;
-    border: 1px solid #00ffff;
+.admin-tab.active {
     color: #00ffff;
+    border-bottom: 2px solid #00ffff;
 }
 
-.profile-rank {
-    background: #ffaa0020;
-    border: 1px solid #ffaa00;
-    color: #ffaa00;
+.admin-tab-content {
+    display: none;
+    padding: 15px 0;
 }
 
-.elo-display {
-    margin-left: auto;
+.admin-tab-content.active {
+    display: block;
 }
 
-.elo-value {
-    color: #00ffff;
-    font-size: 28px;
-    font-weight: 800;
+/* Видео на проверке */
+.pending-videos {
+    max-height: 400px;
+    overflow-y: auto;
 }
 
-/* Прогресс звания */
-.rank-progress {
-    background: #0a0f17;
+.pending-video-item {
+    background: #0f151f;
     border-radius: 12px;
     padding: 15px;
+    margin-bottom: 10px;
 }
 
-.rank-info {
+.pending-video-header {
     display: flex;
     justify-content: space-between;
-    color: white;
-    font-size: 13px;
+    align-items: center;
     margin-bottom: 10px;
 }
 
-.rank-info span:first-child {
+.pending-video-player {
     color: #00ffff;
+    font-weight: 600;
 }
 
-.progress-bar-container {
-    width: 100%;
-    height: 8px;
-    background: #1a2538;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background: #00ffff;
-    border-radius: 10px;
-    transition: width 0.3s;
-}
-
-.progress-stats {
-    text-align: center;
+.pending-video-time {
     color: #8f9bb5;
-    font-size: 12px;
-    margin-top: 8px;
+    font-size: 11px;
 }
 
-/* Калибровка */
-.calibration-section {
-    background: #0f151f;
-}
-
-.calibration-status {
-    background: #0a0f17;
-    border-radius: 15px;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.calibration-icon {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-.calibration-text {
-    color: white;
-}
-
-.weapon-selector {
+.pending-video-info {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     margin: 15px 0;
-}
-
-.weapon-option {
+    padding: 10px;
     background: #0a0f17;
-    border: 1px solid #00ffff40;
-    border-radius: 10px;
-    padding: 12px 5px;
+    border-radius: 8px;
+}
+
+.pending-video-stat {
     text-align: center;
+}
+
+.pending-video-stat-label {
     color: #8f9bb5;
-    cursor: pointer;
-    font-size: 12px;
+    font-size: 10px;
 }
 
-.weapon-option.selected {
-    background: #00ffff20;
-    border-color: #00ffff;
-    color: #00ffff;
-}
-
-.upload-area {
-    background: #0a0f17;
-    border: 2px dashed #00ffff40;
-    border-radius: 15px;
-    padding: 25px;
-    text-align: center;
-    cursor: pointer;
-    margin: 15px 0;
-}
-
-.upload-icon {
-    font-size: 35px;
-    margin-bottom: 10px;
-}
-
-.upload-text {
-    color: #8f9bb5;
-}
-
-.calibration-progress {
-    width: 100%;
-    height: 8px;
-    background: #1a2538;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 15px 0;
-}
-
-.progress-bar {
-    height: 100%;
-    background: #00ffff;
-    width: 0%;
-    transition: width 0.3s;
-}
-
-.progress-text {
-    text-align: center;
-    color: #00ffff;
+.pending-video-stat-value {
+    color: white;
+    font-weight: 600;
     font-size: 14px;
 }
 
-/* Результаты */
-.results-section {
-    background: #0f151f;
-}
-
-.tier-result {
-    text-align: center;
-    padding: 25px;
-    background: #00ffff10;
-    border-radius: 20px;
-    margin: 15px 0;
-}
-
-.tier-big {
-    font-size: 60px;
-    font-weight: 900;
-    color: #00ffff;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+.pending-video-actions {
+    display: flex;
     gap: 10px;
-    margin: 15px 0;
+    margin-top: 10px;
 }
 
-.stat-card {
-    background: #0a0f17;
-    border-radius: 15px;
+.verify-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.verify-btn.accept {
+    background: #00aa00;
+    color: white;
+}
+
+.verify-btn.reject {
+    background: #ff4444;
+    color: white;
+}
+
+.verify-btn.preview {
+    background: #0066ff;
+    color: white;
+}
+
+/* Настройки */
+.settings-group {
+    background: #0f151f;
+    border-radius: 12px;
     padding: 15px;
-    text-align: center;
+    margin-bottom: 15px;
 }
 
-.stat-value {
-    font-size: 24px;
-    font-weight: 800;
+.settings-title {
     color: #00ffff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 15px;
 }
 
-.stat-label {
+.setting-item {
+    margin-bottom: 15px;
+}
+
+.setting-item label {
+    display: block;
+    color: #8f9bb5;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.setting-input {
+    width: 100%;
+    background: #0a0f17;
+    border: 1px solid #00ffff40;
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+}
+
+/* Поиск в админке */
+.admin-search {
+    margin-bottom: 15px;
+}
+
+.admin-search input {
+    width: 100%;
+    background: #0f151f;
+    border: 1px solid #00ffff40;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+}
+
+/* Список пользователей в админке */
+.admin-users-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.admin-user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #00ffff10;
+}
+
+.admin-user-info {
+    flex: 1;
+}
+
+.admin-user-name {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.admin-user-details {
     color: #8f9bb5;
     font-size: 11px;
-    margin-top: 5px;
 }
 
-.elo-gain {
-    text-align: center;
-    font-size: 24px;
-    font-weight: 800;
-    color: #00ff00;
-    margin: 15px 0;
+.admin-user-actions {
+    display: flex;
+    gap: 5px;
 }
 
-/* Футер */
-.footer {
-    padding: 20px;
-    color: #4a5568;
-    font-size: 12px;
-    text-align: center;
+.admin-user-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: pointer;
 }
 
-/* Уведомления */
-.notification {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    background: #000;
-    border: 1px solid #00ffff;
-    border-radius: 15px;
-    padding: 15px;
+.admin-user-btn.edit {
+    background: #0066ff;
     color: white;
-    text-align: center;
-    z-index: 9999;
-    animation: slideDown 0.3s;
 }
 
-@keyframes slideDown {
-    from { transform: translateY(-100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.admin-user-btn.delete {
+    background: #ff4444;
+    color: white;
 }
 
-.hidden {
-    display: none !important;
+/* Модальное окно просмотра видео */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 400px;
+    background: #141a24;
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid #00ffff;
+}
+
+.modal video {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
 }
