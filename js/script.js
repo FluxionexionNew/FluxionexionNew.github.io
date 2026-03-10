@@ -25,6 +25,9 @@ function loadData() {
             password: ADMIN_PASS,
             category: 'Admin',
             elo: 9999,
+            wins: 999,
+            matches: 999,
+            kills: 999,
             isAdmin: true
         }];
     }
@@ -128,6 +131,7 @@ function register() {
         elo: 1000,
         wins: 0,
         matches: 0,
+        kills: 0,
         isAdmin: false
     };
     
@@ -162,6 +166,9 @@ function updateProfile() {
     document.getElementById('profileName').textContent = currentUser.name;
     document.getElementById('profileCat').textContent = currentUser.category;
     document.getElementById('profileElo').textContent = currentUser.elo;
+    document.getElementById('playerWins').textContent = currentUser.wins || 0;
+    document.getElementById('playerMatches').textContent = currentUser.matches || 0;
+    document.getElementById('playerKills').textContent = currentUser.kills || 0;
     
     const rank = getRank(currentUser.elo);
     document.getElementById('profileRank').textContent = rank;
@@ -230,7 +237,7 @@ function updateLeaderboard() {
             <div class="player-rank ${rankClass}">${i + 1}</div>
             <div class="player-info">
                 <div class="player-avatar">👤</div>
-                <div>
+                <div class="player-details">
                     <div class="player-name">${user.name}</div>
                     <div class="player-cat">${user.category}</div>
                 </div>
@@ -293,7 +300,6 @@ function submitVideo() {
     notify('✅ Видео отправлено на проверку!');
     backToProfile();
     
-    // Если админ залогинен, обновляем панель
     if (currentUser?.isAdmin) updateAdminPanel();
 }
 
@@ -305,15 +311,20 @@ function updateAdminPanel() {
     const list = document.getElementById('videosList');
     list.innerHTML = '';
     
+    if (pendingVideos.length === 0) {
+        list.innerHTML = '<div style="color: #8f9bb5; text-align: center; padding: 20px;">Нет видео на проверке</div>';
+        return;
+    }
+    
     pendingVideos.forEach(video => {
         const div = document.createElement('div');
         div.className = 'video-item';
         div.innerHTML = `
             <div class="video-header">
                 <span class="video-player">${video.player}</span>
-                <span style="color: #8f9bb5;">${video.weapon}</span>
+                <span class="video-weapon">${video.weapon}</span>
             </div>
-            <div style="color: #8f9bb5; font-size: 12px; margin-bottom: 10px;">${video.time}</div>
+            <div class="video-time">${video.time}</div>
             <div class="video-actions">
                 <button class="video-btn accept" onclick="acceptVideo(${video.id})">✅ Принять</button>
                 <button class="video-btn reject" onclick="rejectVideo(${video.id})">❌ Отклонить</button>
@@ -332,6 +343,7 @@ function acceptVideo(id) {
         const gain = Math.floor(Math.random() * 300) + 200;
         player.elo += gain;
         player.matches = (player.matches || 0) + 1;
+        player.wins = (player.wins || 0) + 1;
         notify(`✅ ${player.name} получил +${gain} ELO`);
     }
     
