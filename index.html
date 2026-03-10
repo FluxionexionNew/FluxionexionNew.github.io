@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BedrockTiers | PvP ELO System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="bedrock" id="bedrockApp">
+        <!-- ШАПКА -->
+        <div class="header">
+            <div class="logo">BEDROCK<span>TIERS</span></div>
+            <div class="online-count" id="onlineCount">0 ONLINE</div>
+        </div>
 
+        <!-- РЕГИСТРАЦИЯ -->
+        <div id="registerSection" class="section">
+            <div class="section-title">⚡ РЕГИСТРАЦИЯ</div>
+            
+            <div class="input-group">
+                <div class="input-label">НИКНЕЙМ</div>
+                <input type="text" id="regUsername" class="input-field" placeholder="Введите ник">
+            </div>
+            
+            <div class="input-group">
+                <div class="input-label">ПАРОЛЬ</div>
+                <input type="password" id="regPassword" class="input-field" placeholder="••••••••">
+            </div>
+            
+            <div class="input-label">ОСНОВНАЯ КАТЕГОРИЯ</div>
+            <div class="pvp-categories" id="pvpCategories">
+                <div class="pvp-cat selected" data-cat="Sword">⚔️ SWORD</div>
+                <div class="pvp-cat" data-cat="Axe">🪓 AXE</div>
+                <div class="pvp-cat" data-cat="Crystal">💎 CRYSTAL</div>
+                <div class="pvp-cat" data-cat="Mace">🔨 MACE</div>
+            </div>
+            
+            <button class="register-btn" id="registerBtn">🔓 ЗАРЕГИСТРИРОВАТЬСЯ</button>
+        </div>
+
+        <!-- ПРОФИЛЬ (скрыт до регистрации) -->
+        <div id="profileSection" class="section profile-section" style="display: none;">
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <div class="avatar-preview" id="avatarPreview">
+                        <span id="avatarEmoji">👤</span>
+                        <img id="avatarImage" style="display: none;">
+                    </div>
+                    <div class="avatar-upload" id="avatarUploadBtn">
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        <span>✏️</span>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profileName">Игрок</h2>
+                    <div class="profile-badges">
+                        <span class="profile-category" id="profileCategory">Sword</span>
+                        <span class="profile-rank" id="profileRank">Новичок</span>
+                    </div>
+                </div>
+                <div class="elo-display">
+                    <span class="elo-value" id="profileElo">1000</span>
+                </div>
+            </div>
+
+            <!-- Прогресс звания -->
+            <div class="rank-progress">
+                <div class="rank-info">
+                    <span id="currentRankTitle">Новичок</span>
+                    <span id="nextRankTitle">Воин</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="rankProgress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="currentElo">1000</span> / <span id="nextRankElo">1200</span> ELO
+                </div>
+            </div>
+        </div>
+
+        <!-- КАЛИБРОВКА (скрыта до регистрации) -->
+        <div id="calibrationSection" class="section calibration-section" style="display: none;">
+            <div class="section-title">⚡ КАЛИБРОВКА PVP</div>
+            
+            <div class="calibration-status">
+                <div class="calibration-icon">🎮</div>
+                <div class="calibration-text">Загрузи видео с твоим PvP</div>
+            </div>
+
+            <!-- Выбор оружия -->
+            <div class="input-label">ВЫБЕРИ ОРУЖИЕ</div>
+            <div class="weapon-selector" id="weaponSelector">
+                <div class="weapon-option selected" data-weapon="Sword">⚔️ Sword</div>
+                <div class="weapon-option" data-weapon="Axe">🪓 Axe</div>
+                <div class="weapon-option" data-weapon="Crystal">💎 Crystal</div>
+                <div class="weapon-option" data-weapon="Mace">🔨 Mace</div>
+            </div>
+
+            <!-- Загрузка видео -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📹</div>
+                <div class="upload-text">Нажми чтобы загрузить видео</div>
+                <input type="file" id="videoInput" accept="video/*" style="display: none;">
+            </div>
+
+            <!-- Прогресс загрузки -->
+            <div id="uploadProgress" style="display: none;">
+                <div class="calibration-progress">
+                    <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+
+            <button class="analyze-btn" id="analyzeBtn" disabled>🔍 АНАЛИЗИРОВАТЬ</button>
+        </div>
+
+        <!-- РЕЗУЛЬТАТЫ (скрыты) -->
+        <div id="resultsSection" class="section results-section" style="display: none;">
+            <div class="section-title">📊 РЕЗУЛЬТАТЫ</div>
+            
+            <div class="tier-result">
+                <div class="tier-label">ТВОЙ ТИР</div>
+                <div class="tier-big" id="resultTier">HT1</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="resultCombo">0</div>
+                    <div class="stat-label">КОМБО</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="resultWtap">0</div>
+                    <div class="stat-label">W-TAP</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="resultStraf">0</div>
+                    <div class="stat-label">СТРЕЙФ</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="resultCrit">0</div>
+                    <div class="stat-label">КРИТЫ</div>
+                </div>
+            </div>
+
+            <div class="elo-gain" id="resultElo">+250 ELO</div>
+            <button class="continue-btn" id="continueBtn">✅ ПРОДОЛЖИТЬ</button>
+        </div>
+
+        <!-- Футер -->
+        <div class="footer">
+            <div>© 2026 BEDROCKTIERS</div>
+            <div>v1.0</div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+                  </html>
