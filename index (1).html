@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BedrockTiers v6.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Уведомления через Telegram бота (настройки в app.js → CFG.SERVER_URL) -->
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Стили -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-wrapper">
+
+    <!-- НОВОСТНАЯ СТРОКА -->
+    <div class="news-ticker">
+        <span class="news-label">⚡ LIVE</span>
+        <span class="news-text">🏆 FluxionNew достиг HT1 · ⚔️ Турнир UNSTABLE SMP — регистрация открыта · 🎯 Новый сезон рейтинга · 💎 Crystal Cup #4 идёт прямо сейчас</span>
+    </div>
+
+    <!-- ШАПКА -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">⚔️</div>
+            <div>
+                <div>BedrockTiers</div>
+                <div style="font-size:9px;color:var(--text2);letter-spacing:2px;font-weight:400">v6.1</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="online-pill">
+                <div class="online-dot"></div>
+                <span id="online-count">...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ВКЛАДКИ -->
+    <div class="tabs-scroll">
+        <div class="tabs">
+            <div class="tab active"      onclick="showTab('login')">🔐 Вход</div>
+            <div class="tab"             onclick="showTab('register')">📝 Рега</div>
+            <div class="tab"             onclick="showTab('top')">🏆 Топ</div>
+            <div class="tab tab-unstable" onclick="showTab('unstable')">🔥 Unstable</div>
+            <div class="tab hidden" id="tab-profile" onclick="showTab('profile')">👤 Профиль</div>
+            <div class="tab hidden" id="tab-upload"  onclick="showTab('upload')">🎥 Видео</div>
+            <div class="tab hidden" id="tab-skins"   onclick="showTab('skins')">🎨 Скины</div>
+            <div class="tab hidden" id="tab-admin"   onclick="showTab('admin')">⚙️ Админ</div>
+        </div>
+    </div>
+
+    <!-- ═══════════ ВХОД ═══════════ -->
+    <div id="panel-login" class="panel">
+        <div class="card">
+            <div class="card-title">🔐 ВХОД <div class="card-title-line"></div></div>
+            <div class="form-group">
+                <label class="form-label">Никнейм</label>
+                <input class="form-input" id="login-nick" type="text" placeholder="Твой ник в Minecraft">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Пароль</label>
+                <input class="form-input" id="login-pass" type="password" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" onclick="doLogin()">⚡ ВОЙТИ</button>
+            <div class="divider"></div>
+            <p class="text-center text-muted">Нет аккаунта? <a href="#" onclick="showTab('register')" style="color:var(--accent)">Зарегистрируйся</a></p>
+        </div>
+    </div>
+
+    <!-- ═══════════ РЕГИСТРАЦИЯ ═══════════ -->
+    <div id="panel-register" class="panel hidden">
+        <div class="card">
+            <div class="card-title">📝 РЕГИСТРАЦИЯ <div class="card-title-line"></div></div>
+            <div class="form-group">
+                <label class="form-label">Никнейм Minecraft</label>
+                <input class="form-input" id="reg-nick" type="text" placeholder="Точный ник в игре">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" id="reg-email" type="email" placeholder="твой@email.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Пароль</label>
+                <input class="form-input" id="reg-pass" type="password" placeholder="Минимум 6 символов">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Основное оружие</label>
+                <select class="form-select" id="reg-weapon">
+                    <option value="sword">⚔️ Sword</option>
+                    <option value="axe">🪓 Axe</option>
+                    <option value="crystal">💎 Crystal</option>
+                    <option value="mace">🔨 Mace</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="doRegister()">🚀 СОЗДАТЬ АККАУНТ</button>
+            <p class="text-center mt-3" style="font-size:11px;color:var(--text2);">На email придёт реальный код подтверждения</p>
+        </div>
+    </div>
+
+    <!-- ═══════════ ТОП ═══════════ -->
+    <div id="panel-top" class="panel hidden">
+        <div class="card">
+            <div class="card-title">🏆 РЕЙТИНГ <div class="card-title-line"></div></div>
+            <div class="lb-search">
+                <input class="form-input" id="lb-search" type="text" placeholder="🔍 Поиск игрока..." oninput="renderLeaderboard()">
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+                <button style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);flex:1;border-radius:8px;padding:7px;font-size:11px;cursor:pointer;font-family:'Orbitron',sans-serif;" onclick="setLbFilter('all')">Все</button>
+                <button style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);flex:1;border-radius:8px;padding:7px;font-size:11px;cursor:pointer;font-family:'Orbitron',sans-serif;" onclick="setLbFilter('sword')">⚔️</button>
+                <button style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);flex:1;border-radius:8px;padding:7px;font-size:11px;cursor:pointer;font-family:'Orbitron',sans-serif;" onclick="setLbFilter('crystal')">💎</button>
+                <button style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);flex:1;border-radius:8px;padding:7px;font-size:11px;cursor:pointer;font-family:'Orbitron',sans-serif;" onclick="setLbFilter('axe')">🪓</button>
+                <button style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);flex:1;border-radius:8px;padding:7px;font-size:11px;cursor:pointer;font-family:'Orbitron',sans-serif;" onclick="setLbFilter('mace')">🔨</button>
+            </div>
+            <div id="leaderboard-list"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════ UNSTABLE SMP ═══════════ -->
+    <div id="panel-unstable" class="panel hidden">
+        <div class="unstable-header">
+            <div class="unstable-logo">🔥 UNSTABLE SMP</div>
+            <div class="unstable-sub">HARDCORE BEDROCK EVENTS</div>
+        </div>
+        <div class="server-status">
+            <div class="server-card">
+                <div class="server-val" style="color:var(--success)" id="smp-online">...</div>
+                <div class="server-lbl">Онлайн</div>
+            </div>
+            <div class="server-card">
+                <div class="server-val" style="color:var(--gold)" id="smp-events">0</div>
+                <div class="server-lbl">Ивентов</div>
+            </div>
+            <div class="server-card">
+                <div class="server-val" style="color:var(--danger)">S4</div>
+                <div class="server-lbl">Сезон</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">⚡ ИВЕНТЫ <div class="card-title-line"></div></div>
+            <div id="events-list"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">📋 ПРАВИЛА <div class="card-title-line"></div></div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.9;">
+                <div>🔴 <strong style="color:var(--text)">Hardcore</strong> — 3 жизни на сезон</div>
+                <div>⚔️ <strong style="color:var(--text)">PvP</strong> разрешён везде кроме хаба</div>
+                <div>💎 <strong style="color:var(--text)">Crystal PvP</strong> — отдельный рейтинг</div>
+                <div>🏆 <strong style="color:var(--text)">Ивенты</strong> каждую пятницу и субботу</div>
+                <div>🎯 <strong style="color:var(--text)">Призы</strong> — донат + особые скины</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">🏆 ТОП SMP <div class="card-title-line"></div></div>
+            <div id="unstable-top"></div>
+        </div>
+        <div id="smp-join-wrap">
+            <button class="btn btn-unstable" onclick="joinSMP()">🔥 ВСТУПИТЬ В UNSTABLE SMP</button>
+        </div>
+    </div>
+
+    <!-- ═══════════ ПРОФИЛЬ ═══════════ -->
+    <div id="panel-profile" class="panel hidden">
+
+        <!-- Баннер подтверждения email -->
+        <div class="verify-banner hidden" id="verify-banner">
+            <div class="verify-icon">📧</div>
+            <div class="verify-text">Email не подтверждён — проверь почту!</div>
+            <button class="verify-btn" onclick="requestVerifyCode()">Получить код</button>
+        </div>
+
+        <!-- Форма ввода кода -->
+        <div id="verify-code-wrap" class="card hidden" style="margin-bottom:12px;">
+            <div class="card-title">📧 ПОДТВЕРЖДЕНИЕ EMAIL <div class="card-title-line"></div></div>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Код придёт в Telegram от бота</p>
+            <div class="code-input">
+                <input type="text" id="verify-code-input" placeholder="000000" maxlength="6" inputmode="numeric">
+                <button onclick="verifyCode()">✓ ОК</button>
+            </div>
+            <p style="font-size:11px;color:var(--text3);margin-top:8px;">
+                Не получил? <a href="#" onclick="resendCode()" style="color:var(--accent)">Отправить снова</a>
+            </p>
+        </div>
+
+        <!-- Основная карточка профиля -->
+        <div class="card">
+            <div class="profile-header">
+                <!-- АВАТАР с кнопкой загрузки -->
+                <div class="avatar-wrap">
+                    <div class="avatar-upload-zone" onclick="document.getElementById('avatar-file').click()">
+                        <input type="file" id="avatar-file" accept="image/*" onchange="handleAvatarSelect(this)">
+                        <img id="avatar-upload-preview" class="profile-avatar-img" src="" alt="avatar" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                        <div style="font-size:22px;" id="avatar-placeholder">📷</div>
+                        <div style="font-size:9px;color:var(--text3);margin-top:2px;" id="avatar-placeholder-text">загрузить</div>
+                        <div class="avatar-upload-overlay">✏️</div>
+                    </div>
+                    <div class="avatar-overlay">✓</div>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name" id="profile-name">---</div>
+                    <div class="profile-email" id="profile-email">---</div>
+                    <span class="tier-badge" id="profile-tier-badge">LT5</span>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value glow-accent" id="stat-elo">1000</div>
+                    <div class="stat-label">ELO</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-wins" style="color:var(--success)">0</div>
+                    <div class="stat-label">Побед</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-videos" style="color:var(--purple)">0</div>
+                    <div class="stat-label">Видео</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-streak" style="color:var(--gold)">0</div>
+                    <div class="stat-label">Серия</div>
+                </div>
+            </div>
+
+            <!-- Прогресс ранга -->
+            <div class="progress-wrap">
+                <div class="progress-labels">
+                    <span id="rank-from">Новичок</span>
+                    <span id="rank-to">Воин</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="rank-progress" style="width:0%"></div>
+                </div>
+            </div>
+
+            <button class="btn btn-danger" style="margin-top:4px;" onclick="logout()">🚪 Выйти</button>
+        </div>
+
+        <!-- Достижения -->
+        <div class="card">
+            <div class="card-title">🏅 ДОСТИЖЕНИЯ <div class="card-title-line"></div></div>
+            <div class="achievements-grid" id="achievements-grid"></div>
+        </div>
+
+        <!-- История заявок -->
+        <div class="card">
+            <div class="card-title">📋 ИСТОРИЯ ЗАЯВОК <div class="card-title-line"></div></div>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════ ЗАГРУЗКА ВИДЕО ═══════════ -->
+    <div id="panel-upload" class="panel hidden">
+        <div class="card">
+            <div class="card-title">🎥 ЗАГРУЗИТЬ ВИДЕО <div class="card-title-line"></div></div>
+            <div class="form-group">
+                <label class="form-label">Оружие в видео</label>
+                <select class="form-select" id="upload-weapon">
+                    <option value="sword">⚔️ Sword</option>
+                    <option value="axe">🪓 Axe</option>
+                    <option value="crystal">💎 Crystal</option>
+                    <option value="mace">🔨 Mace</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Противник (опционально)</label>
+                <input class="form-input" id="upload-opponent" type="text" placeholder="Ник оппонента">
+            </div>
+            <div class="upload-zone" onclick="document.getElementById('video-file').click()">
+                <input type="file" id="video-file" accept="video/*" onchange="handleFileSelect(this)">
+                <div class="upload-icon">📹</div>
+                <div id="upload-text" style="font-size:14px;color:var(--text2);">Нажми или перетащи видео</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:4px;">MP4, MOV — до 100MB</div>
+            </div>
+            <button class="btn btn-primary hidden" id="submit-btn" onclick="submitVideo()">📤 ОТПРАВИТЬ НА ПРОВЕРКУ</button>
+            <div id="pending-status"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">ℹ️ КАК ЭТО РАБОТАЕТ <div class="card-title-line"></div></div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.9;">
+                <div>1️⃣ Запиши победу в качестве <strong style="color:var(--text)">720p+</strong></div>
+                <div>2️⃣ Загрузи видео через эту форму</div>
+                <div>3️⃣ Админ проверит в течение <strong style="color:var(--text)">24 часов</strong></div>
+                <div>4️⃣ Получишь <strong style="color:var(--success)">+50 ELO</strong> за победу</div>
+                <div>5️⃣ Результат придёт на <strong style="color:var(--accent)">email</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ СКИНЫ ═══════════ -->
+    <div id="panel-skins" class="panel hidden">
+        <div class="card">
+            <div class="card-title">🎨 МОЙ СКИН <div class="card-title-line"></div></div>
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+                <img id="skin-preview-full" src="" style="width:56px;height:112px;image-rendering:pixelated;border-radius:6px;border:2px solid var(--accent);" alt="">
+                <div style="flex:1;">
+                    <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">Скин синхронизирован с Minecraft по нику.</div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+                        <span class="tag" style="background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.2);">Java Edition</span>
+                        <span class="tag" style="background:rgba(0,255,136,0.08);color:var(--success);border:1px solid rgba(0,255,136,0.15);">Синхронизирован</span>
+                    </div>
+                    <button class="btn btn-primary" style="padding:9px;" onclick="refreshSkin()">🔄 Обновить скин</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">🏆 СКИНЫ-НАГРАДЫ <div class="card-title-line"></div></div>
+            <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Разблокируй за достижения</p>
+            <div class="skin-panel" id="reward-skins"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">🌐 НАЙТИ ИГРОКА <div class="card-title-line"></div></div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <input class="form-input" id="skin-search-nick" placeholder="Ник в Minecraft" style="flex:1;">
+                <button onclick="searchPlayerSkin()" style="background:var(--accent2);border:none;border-radius:12px;padding:0 14px;color:#000;font-family:'Orbitron',sans-serif;font-size:11px;cursor:pointer;white-space:nowrap;">НАЙТИ</button>
+            </div>
+            <div id="skin-search-result"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════ АДМИН ═══════════ -->
+    <div id="panel-admin" class="panel hidden">
+        <div class="card">
+            <div class="card-title">⚙️ АДМИН ПАНЕЛЬ <div class="card-title-line"></div></div>
+            <div class="admin-grid">
+                <div class="admin-stat"><div class="admin-stat-val" id="admin-total">0</div><div class="admin-stat-lbl">Игроков</div></div>
+                <div class="admin-stat"><div class="admin-stat-val" id="admin-pending">0</div><div class="admin-stat-lbl">На проверке</div></div>
+                <div class="admin-stat"><div class="admin-stat-val" id="admin-approved">0</div><div class="admin-stat-lbl">Одобрено</div></div>
+                <div class="admin-stat"><div class="admin-stat-val" id="admin-rejected">0</div><div class="admin-stat-lbl">Отклонено</div></div>
+            </div>
+            <div id="admin-submissions"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">🔧 УПРАВЛЕНИЕ ELO <div class="card-title-line"></div></div>
+            <div class="form-group">
+                <input class="form-input" id="admin-nick" placeholder="Ник игрока">
+            </div>
+            <div class="form-group">
+                <input class="form-input" id="admin-elo" type="number" placeholder="+50 или -30">
+            </div>
+            <button class="btn btn-primary" onclick="adminChangeElo()">⚡ ИЗМЕНИТЬ ELO</button>
+        </div>
+        <div class="card">
+            <div class="card-title">📧 EMAIL УВЕДОМЛЕНИЯ <div class="card-title-line"></div></div>
+            <div class="form-group">
+                <input class="form-input" id="admin-email-nick" placeholder="Ник игрока">
+            </div>
+            <button class="btn" style="background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);color:var(--purple);" onclick="adminSendTestEmail()">📧 ОТПРАВИТЬ ТЕСТ</button>
+        </div>
+        <div class="card">
+            <div class="card-title">🔥 УПРАВЛЕНИЕ UNSTABLE <div class="card-title-line"></div></div>
+            <div class="form-group">
+                <input class="form-input" id="admin-event-title" placeholder="Название ивента">
+            </div>
+            <div class="form-group">
+                <select class="form-select" id="admin-event-status">
+                    <option value="live">🔴 Идёт сейчас</option>
+                    <option value="soon">🟡 Скоро</option>
+                    <option value="ended">⚫ Завершён</option>
+                </select>
+            </div>
+            <button class="btn btn-unstable" onclick="adminAddEvent()">🔥 ДОБАВИТЬ ИВЕНТ</button>
+        </div>
+    </div>
+
+</div><!-- /app-wrapper -->
+
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Логика приложения -->
+<script src="app.js"></script>
+</body>
+</html>
