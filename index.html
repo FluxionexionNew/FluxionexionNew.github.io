@@ -3,13 +3,1055 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BedrockTiers v6.1</title>
+    <title>BedrockTiers v6.3 — YouTube + Tiers</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Уведомления через Telegram бота (настройки в app.js → CFG.SERVER_URL) -->
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Стили -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --bg: #0f0505;
+            --bg2: #1a0a0a;
+            --card: #1f0c0c;
+            --card2: #2a0f0f;
+            --border: #4d1f1f;
+            --accent: #ff3b3b;
+            --accent2: #cc0000;
+            --accent-glow: rgba(255, 59, 59, 0.15);
+            --gold: #ffaa00;
+            --danger: #ff6b6b;
+            --success: #ff8888;
+            --purple: #ff6b6b;
+            --text: #ffe5e5;
+            --text2: #ffb3b3;
+            --text3: #cc7a7a;
+            --ht: #ff4444;
+            --lt: #ff8888;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(255, 0, 0, 0.02) 0px, rgba(255, 0, 0, 0.02) 2px, transparent 2px, transparent 4px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* НОВОСТНАЯ СТРОКА */
+        .news-ticker {
+            background: linear-gradient(90deg, #2a0a0a, #3d0f0f);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.2);
+        }
+
+        .news-label {
+            background: var(--accent);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        .news-text {
+            color: var(--text2);
+            font-size: 12px;
+            animation: scroll 20s linear infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; background: #ff6666; }
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* ШАПКА */
+        .header {
+            background: rgba(20, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(255, 0, 0, 0.15);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .online-pill {
+            background: rgba(255, 70, 70, 0.15);
+            border: 1px solid rgba(255, 70, 70, 0.25);
+            border-radius: 30px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4444;
+            box-shadow: 0 0 10px #ff4444;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        /* ВКЛАДКИ */
+        .tabs-scroll {
+            overflow-x: auto;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            padding: 4px;
+        }
+
+        .tab {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            color: var(--text2);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(255, 59, 59, 0.2), rgba(204, 0, 0, 0.15));
+            color: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+        }
+
+        .tab-unstable {
+            background: linear-gradient(135deg, #2a0a0a, #3d0f0f);
+            border-color: #ff4444;
+            color: #ff8888;
+        }
+
+        .tab-unstable.active {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: #000;
+        }
+
+        .tab.hidden {
+            display: none;
+        }
+
+        /* КАРТОЧКИ */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 0 #1a0808;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--text2);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+
+        /* ФОРМЫ */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            color: var(--text2);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
+        }
+
+        /* КНОПКИ */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #000;
+            box-shadow: 0 4px 0 #8b0000, 0 6px 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #8b0000, 0 8px 25px rgba(255, 0, 0, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #8b0000;
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.15);
+            color: #ff8888;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 68, 68, 0.25);
+        }
+
+        .btn-unstable {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: #000;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 0 #8b0000;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        /* ПРОФИЛЬ */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            width: 70px;
+            height: 70px;
+        }
+
+        .avatar-upload-zone {
+            width: 100%;
+            height: 100%;
+            background: var(--bg2);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-upload-zone:hover {
+            border-color: var(--accent);
+            background: rgba(255, 59, 59, 0.05);
+        }
+
+        .avatar-upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .avatar-upload-zone:hover .avatar-upload-overlay {
+            opacity: 1;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000;
+            border: 2px solid var(--card);
+        }
+
+        .profile-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            font-size: 11px;
+            color: var(--text2);
+            margin-bottom: 6px;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff4444, #aa2222);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #000;
+            border: 1px solid #ff8888;
+        }
+
+        /* СТАТИСТИКА */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .glow-accent {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: var(--text2);
+            text-transform: uppercase;
+        }
+
+        /* ПРОГРЕСС БАР */
+        .progress-wrap {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text2);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ff8888);
+            border-radius: 3px;
+            transition: width 0.5s;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* ДОСТИЖЕНИЯ */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .ach-item {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 5px;
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        .ach-item.unlocked {
+            opacity: 1;
+            border-color: var(--accent);
+            background: rgba(255, 59, 59, 0.1);
+        }
+
+        .ach-icon {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .ach-name {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text2);
+        }
+
+        /* ЛИДЕРБОРД */
+        .lb-search {
+            margin-bottom: 12px;
+        }
+
+        .lb-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .lb-item:hover {
+            border-color: var(--accent);
+            background: rgba(255, 59, 59, 0.05);
+            transform: translateX(5px);
+        }
+
+        .lb-rank-1 {
+            border-left: 4px solid #ffd700;
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent);
+        }
+
+        .lb-rank-2 {
+            border-left: 4px solid #c0c0c0;
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), transparent);
+        }
+
+        .lb-rank-3 {
+            border-left: 4px solid #cd7f32;
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), transparent);
+        }
+
+        .lb-pos {
+            min-width: 30px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .lb-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .lb-info {
+            flex: 1;
+        }
+
+        .lb-nick {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .lb-sub {
+            font-size: 11px;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+
+        .lb-elo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* UNSTABLE SMP */
+        .unstable-header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .unstable-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff4444, #ff8888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 68, 68, 0.5);
+            margin-bottom: 4px;
+        }
+
+        .unstable-sub {
+            font-size: 11px;
+            color: var(--text2);
+            letter-spacing: 2px;
+        }
+
+        .server-status {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .server-card {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .server-val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 2px;
+        }
+
+        .server-lbl {
+            font-size: 10px;
+            color: var(--text2);
+        }
+
+        /* ИВЕНТЫ */
+        .event-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .event-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .event-title {
+            font-weight: 700;
+        }
+
+        .event-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .badge-live {
+            background: rgba(255, 68, 68, 0.15);
+            color: #ff8888;
+        }
+
+        .badge-soon {
+            background: rgba(255, 170, 0, 0.15);
+            color: #ffaa00;
+        }
+
+        .badge-ended {
+            background: rgba(100, 100, 100, 0.15);
+            color: #999;
+        }
+
+        .event-info {
+            font-size: 12px;
+            color: var(--text2);
+            margin-bottom: 8px;
+        }
+
+        .event-prizes {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .prize-tag {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 10px;
+            color: var(--gold);
+        }
+
+        /* ЗАГРУЗКА ВИДЕО */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--bg2);
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent);
+            background: rgba(255, 59, 59, 0.05);
+        }
+
+        .upload-zone input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            color: var(--text2);
+            margin-bottom: 10px;
+        }
+
+        /* СТАТУС ЗАЯВКИ */
+        .pending-card {
+            background: rgba(255, 59, 59, 0.1);
+            border: 1px solid rgba(255, 59, 59, 0.3);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 59, 59, 0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ИСТОРИЯ ЗАЯВОК */
+        .sub-item {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .sub-item-head {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        /* АДМИН ПАНЕЛЬ */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .admin-stat {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 8px;
+            text-align: center;
+        }
+
+        .admin-stat-val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .admin-stat-lbl {
+            font-size: 9px;
+            color: var(--text2);
+            text-transform: uppercase;
+        }
+
+        /* ТЕГИ */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* КОД ПОДТВЕРЖДЕНИЯ */
+        .verify-banner {
+            background: linear-gradient(135deg, #2a0a0a, #3d0f0f);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .verify-icon {
+            font-size: 24px;
+        }
+
+        .verify-text {
+            flex: 1;
+            font-size: 12px;
+            color: var(--text2);
+        }
+
+        .verify-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .code-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-input input {
+            flex: 1;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            color: var(--text);
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+
+        .code-input button {
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            padding: 0 16px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* СКИНЫ */
+        .skin-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .skin-item {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .skin-item:hover {
+            border-color: var(--accent);
+        }
+
+        .skin-item.active {
+            border-color: var(--accent);
+            background: rgba(255, 59, 59, 0.1);
+        }
+
+        .skin-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .skin-name {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* TOAST УВЕДОМЛЕНИЯ */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--card2);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 13px;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .toast.success { border-left-color: #ff8888; }
+        .toast.error { border-left-color: #ff4444; }
+        .toast.warning { border-left-color: #ffaa00; }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-body {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .toast-msg {
+            font-size: 11px;
+            color: var(--text2);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* УТИЛИТЫ */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text2); }
+        .mt-3 { margin-top: 12px; }
+        .mt-4 { margin-top: 16px; }
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 16px 0;
+        }
+
+        /* СКРОЛЛБАР */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff6666;
+        }
+
+        /* АНИМАЦИИ */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 59, 59, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 59, 59, 0.8); }
+        }
+
+        .glow {
+            animation: glow 2s infinite;
+        }
+
+        /* МЕДИА ЗАПРОСЫ */
+        @media (max-width: 400px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .admin-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .skin-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="app-wrapper">
@@ -26,7 +1068,7 @@
             <div class="logo-icon">⚔️</div>
             <div>
                 <div>BedrockTiers</div>
-                <div style="font-size:9px;color:var(--text2);letter-spacing:2px;font-weight:400">v6.1</div>
+                <div style="font-size:9px;color:var(--text2);letter-spacing:2px;font-weight:400">v6.3</div>
             </div>
         </div>
         <div class="header-right">
@@ -95,7 +1137,7 @@
                 </select>
             </div>
             <button class="btn btn-primary" onclick="doRegister()">🚀 СОЗДАТЬ АККАУНТ</button>
-            <p class="text-center mt-3" style="font-size:11px;color:var(--text2);">На email придёт реальный код подтверждения</p>
+            <p class="text-center mt-3" style="font-size:11px;color:var(--text2);">После регистрации подтверди email</p>
         </div>
     </div>
 
@@ -190,7 +1232,7 @@
                 <div class="avatar-wrap">
                     <div class="avatar-upload-zone" onclick="document.getElementById('avatar-file').click()">
                         <input type="file" id="avatar-file" accept="image/*" onchange="handleAvatarSelect(this)">
-                        <img id="avatar-upload-preview" class="profile-avatar-img" src="" alt="avatar" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                        <img id="avatar-upload-preview" class="profile-avatar-img" src="" alt="avatar" style="display:none;">
                         <div style="font-size:22px;" id="avatar-placeholder">📷</div>
                         <div style="font-size:9px;color:var(--text3);margin-top:2px;" id="avatar-placeholder-text">загрузить</div>
                         <div class="avatar-upload-overlay">✏️</div>
@@ -251,43 +1293,8 @@
         </div>
     </div>
 
-    <!-- ═══════════ ЗАГРУЗКА ВИДЕО ═══════════ -->
-    <div id="panel-upload" class="panel hidden">
-        <div class="card">
-            <div class="card-title">🎥 ЗАГРУЗИТЬ ВИДЕО <div class="card-title-line"></div></div>
-            <div class="form-group">
-                <label class="form-label">Оружие в видео</label>
-                <select class="form-select" id="upload-weapon">
-                    <option value="sword">⚔️ Sword</option>
-                    <option value="axe">🪓 Axe</option>
-                    <option value="crystal">💎 Crystal</option>
-                    <option value="mace">🔨 Mace</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Противник (опционально)</label>
-                <input class="form-input" id="upload-opponent" type="text" placeholder="Ник оппонента">
-            </div>
-            <div class="upload-zone" onclick="document.getElementById('video-file').click()">
-                <input type="file" id="video-file" accept="video/*" onchange="handleFileSelect(this)">
-                <div class="upload-icon">📹</div>
-                <div id="upload-text" style="font-size:14px;color:var(--text2);">Нажми или перетащи видео</div>
-                <div style="font-size:11px;color:var(--text3);margin-top:4px;">MP4, MOV — до 100MB</div>
-            </div>
-            <button class="btn btn-primary hidden" id="submit-btn" onclick="submitVideo()">📤 ОТПРАВИТЬ НА ПРОВЕРКУ</button>
-            <div id="pending-status"></div>
-        </div>
-        <div class="card">
-            <div class="card-title">ℹ️ КАК ЭТО РАБОТАЕТ <div class="card-title-line"></div></div>
-            <div style="font-size:13px;color:var(--text2);line-height:1.9;">
-                <div>1️⃣ Запиши победу в качестве <strong style="color:var(--text)">720p+</strong></div>
-                <div>2️⃣ Загрузи видео через эту форму</div>
-                <div>3️⃣ Админ проверит в течение <strong style="color:var(--text)">24 часов</strong></div>
-                <div>4️⃣ Получишь <strong style="color:var(--success)">+50 ELO</strong> за победу</div>
-                <div>5️⃣ Результат придёт на <strong style="color:var(--accent)">email</strong></div>
-            </div>
-        </div>
-    </div>
+    <!-- ═══════════ ЗАГРУЗКА ВИДЕО ═══════════ (динамически через JS) -->
+    <div id="panel-upload" class="panel hidden"></div>
 
     <!-- ═══════════ СКИНЫ ═══════════ -->
     <div id="panel-skins" class="panel hidden">
@@ -298,8 +1305,8 @@
                 <div style="flex:1;">
                     <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">Скин синхронизирован с Minecraft по нику.</div>
                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-                        <span class="tag" style="background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.2);">Java Edition</span>
-                        <span class="tag" style="background:rgba(0,255,136,0.08);color:var(--success);border:1px solid rgba(0,255,136,0.15);">Синхронизирован</span>
+                        <span class="tag" style="background:rgba(255,59,59,0.1);color:var(--accent);border:1px solid rgba(255,59,59,0.2);">Java Edition</span>
+                        <span class="tag" style="background:rgba(255,136,136,0.08);color:var(--success);border:1px solid rgba(255,136,136,0.15);">Синхронизирован</span>
                     </div>
                     <button class="btn btn-primary" style="padding:9px;" onclick="refreshSkin()">🔄 Обновить скин</button>
                 </div>
@@ -332,6 +1339,13 @@
             </div>
             <div id="admin-submissions"></div>
         </div>
+
+        <!-- УПРАВЛЕНИЕ ТИРАМИ (НОВОЕ) -->
+        <div class="card">
+            <div class="card-title">🎯 УПРАВЛЕНИЕ ТИРАМИ <div class="card-title-line"></div></div>
+            <div id="tier-management"></div>
+        </div>
+        
         <div class="card">
             <div class="card-title">🔧 УПРАВЛЕНИЕ ELO <div class="card-title-line"></div></div>
             <div class="form-group">
@@ -347,7 +1361,7 @@
             <div class="form-group">
                 <input class="form-input" id="admin-email-nick" placeholder="Ник игрока">
             </div>
-            <button class="btn" style="background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);color:var(--purple);" onclick="adminSendTestEmail()">📧 ОТПРАВИТЬ ТЕСТ</button>
+            <button class="btn" style="background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.25);color:var(--purple);" onclick="adminSendTestEmail()">📧 ОТПРАВИТЬ ТЕСТ</button>
         </div>
         <div class="card">
             <div class="card-title">🔥 УПРАВЛЕНИЕ UNSTABLE <div class="card-title-line"></div></div>
@@ -369,7 +1383,767 @@
 
 <div class="toast-container" id="toast-container"></div>
 
-<!-- Логика приложения -->
-<script src="app.js"></script>
+<!-- ПОЛНЫЙ JS КОД -->
+<script>
+// ============================================================
+//  КОНФИГУРАЦИЯ
+// ============================================================
+const CFG = {
+    SERVER_URL:   'https://bedrock-bot--yandextest717.replit.app',
+    MC_SERVER_IP: 'play.bedrockpvp.net',
+    ADMIN_NICK:   'FluxionNew',
+    ADMIN_PASS:   'admin123'
+};
+
+// ============================================================
+//  TELEGRAM
+// ============================================================
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+// ============================================================
+//  STATE
+// ============================================================
+let DB = JSON.parse(localStorage.getItem('bedrock_v7')) || {
+    users: {
+        'FluxionNew': {
+            nick: 'FluxionNew', pass: 'admin123',
+            email: 'admin@bedrock.gg', emailVerified: true,
+            elo: 2800, weapon: 'crystal', wins: 12, videos: 8,
+            streak: 5, admin: true, smpMember: true,
+            avatar: null, activeSkin: null,
+            forceTier: null
+        },
+        'StormBlade': {
+            nick: 'StormBlade', pass: 'pass123',
+            email: 'storm@mail.ru', emailVerified: true,
+            elo: 2400, weapon: 'sword', wins: 9, videos: 6,
+            streak: 3, admin: false, smpMember: true,
+            avatar: null, activeSkin: null,
+            forceTier: null
+        },
+        'CrystalKing': {
+            nick: 'CrystalKing', pass: 'pass123',
+            email: 'crystal@mail.ru', emailVerified: false,
+            elo: 2100, weapon: 'crystal', wins: 7, videos: 5,
+            streak: 1, admin: false, smpMember: false,
+            avatar: null, activeSkin: null,
+            forceTier: null
+        }
+    },
+    submissions: [],
+    events: [
+        { id: 'e1', title: 'Crystal Cup #4',    status: 'live',  desc: 'Турнир по Crystal PvP, 16 игроков, BO3', date: 'Сб 22:00', prizes: ['1000 RUB', 'Донат', 'Скин HT'] },
+        { id: 'e2', title: 'Sword Duel Season', status: 'soon',  desc: 'Сезонный рейтинг Sword PvP, 2 недели',   date: 'Вс 20:00', prizes: ['500 RUB', 'Роль', 'Скин'] },
+        { id: 'e3', title: 'Mace Madness',      status: 'ended', desc: 'Mace PvP Battle Royale, 32 игрока',      date: 'Завершён',  prizes: ['Скин', 'Роль'] }
+    ],
+    smpMembers: ['FluxionNew', 'StormBlade']
+};
+
+let currentUser = null;
+let selectedFile = null;
+let selectedYoutubeUrl = null;
+let lbFilter = 'all';
+let pendingCode = null;
+let uploadMode = 'file';
+
+function saveData() { localStorage.setItem('bedrock_v7', JSON.stringify(DB)); }
+
+// ============================================================
+//  TOAST
+// ============================================================
+function showToast(title, message, type = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML =
+        '<div class="toast-icon">' + (type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️') + '</div>' +
+        '<div class="toast-body">' +
+            '<div class="toast-title">' + title + '</div>' +
+            '<div class="toast-msg">' + message + '</div>' +
+        '</div>';
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+}
+
+// ============================================================
+//  TABS
+// ============================================================
+function showTab(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.remove('hidden');
+    const btn = document.querySelector('[onclick="showTab(\'' + name + '\')"]');
+    if (btn) btn.classList.add('active');
+    if (name === 'top') renderLeaderboard();
+    if (name === 'profile' && currentUser) renderProfile();
+    if (name === 'admin' && currentUser?.admin) renderAdminPanel();
+    if (name === 'upload' && currentUser) renderUploadTab();
+    if (name === 'skins' && currentUser) renderSkins();
+    if (name === 'unstable') renderUnstable();
+}
+
+// ============================================================
+//  AUTH
+// ============================================================
+function doLogin() {
+    const nick = document.getElementById('login-nick').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    const user = DB.users[nick];
+    if (!user || user.pass !== pass) {
+        showToast('Ошибка', 'Неверный ник или пароль', 'error');
+        return;
+    }
+    currentUser = user;
+    afterLogin();
+    showToast('Добро пожаловать!', 'Привет, ' + nick + '! 👋', 'success');
+    showTab('profile');
+}
+
+function doRegister() {
+    const nick = document.getElementById('reg-nick').value.trim();
+    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+    const pass = document.getElementById('reg-pass').value;
+    const weapon = document.getElementById('reg-weapon').value;
+
+    if (!nick || !email || !pass || !weapon) { showToast('Ошибка', 'Заполните все поля', 'error'); return; }
+    if (pass.length < 6) { showToast('Ошибка', 'Пароль минимум 6 символов', 'error'); return; }
+    if (DB.users[nick]) { showToast('Ошибка', 'Ник уже занят', 'error'); return; }
+    if (!email.includes('@') || !email.includes('.')) { showToast('Ошибка', 'Неверный email', 'error'); return; }
+
+    DB.users[nick] = {
+        nick, pass, email, emailVerified: false,
+        elo: 1000, weapon, wins: 0, videos: 0,
+        streak: 0, admin: false, smpMember: false,
+        avatar: null, activeSkin: null,
+        forceTier: null
+    };
+    saveData();
+    currentUser = DB.users[nick];
+    afterLogin();
+    showToast('Аккаунт создан!', 'Добро пожаловать!', 'success');
+    showTab('profile');
+}
+
+function afterLogin() {
+    ['tab-profile', 'tab-upload', 'tab-skins'].forEach(id => {
+        document.getElementById(id).classList.remove('hidden');
+    });
+    if (currentUser.admin) {
+        document.getElementById('tab-admin').classList.remove('hidden');
+    }
+}
+
+function logout() {
+    currentUser = null;
+    ['tab-profile', 'tab-upload', 'tab-skins', 'tab-admin'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    showTab('login');
+}
+
+// ============================================================
+//  СИСТЕМА ТИРОВ
+// ============================================================
+function getTier(elo, user = null) {
+    if (user?.forceTier) return user.forceTier;
+    if (elo >= 3000) return 'HT1';
+    if (elo >= 2700) return 'HT2';
+    if (elo >= 2400) return 'HT3';
+    if (elo >= 2100) return 'LT1';
+    if (elo >= 1800) return 'LT2';
+    if (elo >= 1500) return 'LT3';
+    if (elo >= 1200) return 'LT4';
+    return 'LT5';
+}
+
+function getTierColor(tier) {
+    const colors = {
+        'HT1': '#ff4444', 'HT2': '#ff6666', 'HT3': '#ff8888',
+        'LT1': '#44ff44', 'LT2': '#44ddff', 'LT3': '#44aaff',
+        'LT4': '#8844ff', 'LT5': '#aa44ff'
+    };
+    return colors[tier] || '#ffffff';
+}
+
+function getProgress(elo, user = null) {
+    if (user?.forceTier) return { from: 'Принудительный', to: user.forceTier, pct: 100 };
+    
+    const th = [0, 1200, 1500, 1800, 2100, 2400, 2700, 3000];
+    const names = ['Новичок', 'Воин', 'Ветеран', 'Боец', 'Элита', 'Мастер', 'Гранд', 'Легенда'];
+    let idx = 0;
+    for (let i = 1; i < th.length; i++) { if (elo >= th[i]) idx = i; }
+    const from = th[idx], to = th[idx + 1] || 3000;
+    return {
+        from: names[idx],
+        to: names[idx + 1] || 'MAX',
+        pct: Math.min(100, Math.max(0, ((elo - from) / (to - from)) * 100))
+    };
+}
+
+// ============================================================
+//  ЗАГРУЗКА ВИДЕО
+// ============================================================
+function renderUploadTab() {
+    const html = `
+        <div class="card">
+            <div class="card-title">🎥 ЗАГРУЗИТЬ ВИДЕО <div class="card-title-line"></div></div>
+            
+            <div style="display:flex; gap:10px; margin-bottom:16px;">
+                <button class="btn ${uploadMode !== 'youtube' ? 'btn-primary' : 'btn'}" style="flex:1;" onclick="setUploadMode('file')">📹 Файл</button>
+                <button class="btn ${uploadMode === 'youtube' ? 'btn-primary' : 'btn'}" style="flex:1;" onclick="setUploadMode('youtube')">▶️ YouTube</button>
+            </div>
+            
+            <div id="upload-mode-file" ${uploadMode !== 'youtube' ? '' : 'style="display:none;"'}>
+                <div class="upload-zone" onclick="document.getElementById('video-file').click()">
+                    <input type="file" id="video-file" accept="video/*" onchange="handleFileSelect(this)">
+                    <div class="upload-icon">📹</div>
+                    <div id="upload-text" style="font-size:14px;color:var(--text2);">Нажми или перетащи видео</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:4px;">MP4, MOV — до 100MB</div>
+                </div>
+            </div>
+            
+            <div id="upload-mode-youtube" style="display:${uploadMode === 'youtube' ? 'block' : 'none'};">
+                <div class="form-group">
+                    <label class="form-label">Ссылка на YouTube видео</label>
+                    <input class="form-input" id="youtube-url" type="url" placeholder="https://youtu.be/... или https://youtube.com/watch?v=...">
+                </div>
+                <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">
+                    📌 Залей видео на YouTube (можно "Не для всех") и вставь ссылку
+                </div>
+                <div id="youtube-preview" style="display:none; margin-bottom:16px;">
+                    <img id="youtube-thumb" style="width:100%; border-radius:12px; border:2px solid var(--accent);" src="">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Оружие в видео</label>
+                <select class="form-select" id="upload-weapon">
+                    <option value="sword">⚔️ Sword</option>
+                    <option value="axe">🪓 Axe</option>
+                    <option value="crystal">💎 Crystal</option>
+                    <option value="mace">🔨 Mace</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Противник (опционально)</label>
+                <input class="form-input" id="upload-opponent" type="text" placeholder="Ник оппонента">
+            </div>
+            
+            <button class="btn btn-primary" id="submit-btn" onclick="submitVideo()">📤 ОТПРАВИТЬ НА ПРОВЕРКУ</button>
+            <div id="pending-status"></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">ℹ️ КАК ЭТО РАБОТАЕТ <div class="card-title-line"></div></div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.9;">
+                <div>1️⃣ Запиши победу и залей на YouTube (можно скрыто)</div>
+                <div>2️⃣ Вставь ссылку на видео или загрузи файл</div>
+                <div>3️⃣ Админ проверит PvP и нажмет "Принять"</div>
+                <div>4️⃣ Получишь <strong style="color:var(--success)">+50 ELO</strong> за победу</div>
+                <div>5️⃣ Результат придёт в Telegram</div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('panel-upload').innerHTML = html;
+    
+    // Добавляем обработчик для YouTube
+    const urlInput = document.getElementById('youtube-url');
+    if (urlInput) {
+        urlInput.addEventListener('input', function(e) {
+            const url = e.target.value;
+            const videoId = extractYoutubeId(url);
+            if (videoId) {
+                document.getElementById('youtube-preview').style.display = 'block';
+                document.getElementById('youtube-thumb').src = 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg';
+                selectedYoutubeUrl = url;
+            } else {
+                document.getElementById('youtube-preview').style.display = 'none';
+                selectedYoutubeUrl = null;
+            }
+        });
+    }
+}
+
+function setUploadMode(mode) {
+    uploadMode = mode;
+    renderUploadTab();
+}
+
+function extractYoutubeId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function handleFileSelect(input) {
+    selectedFile = input.files[0];
+    if (selectedFile) {
+        document.getElementById('upload-text').textContent = '✅ ' + selectedFile.name;
+    }
+}
+
+async function submitVideo() {
+    if (!currentUser) {
+        showToast('Ошибка', 'Войдите в систему', 'error');
+        return;
+    }
+    
+    const weapon = document.getElementById('upload-weapon').value;
+    const opponent = document.getElementById('upload-opponent').value.trim();
+    const subId = 'sub_' + Date.now();
+    
+    let videoUrl = '';
+    if (uploadMode === 'youtube') {
+        videoUrl = document.getElementById('youtube-url').value.trim();
+        if (!videoUrl || !extractYoutubeId(videoUrl)) {
+            showToast('Ошибка', 'Введите корректную YouTube ссылку', 'error');
+            return;
+        }
+    } else {
+        if (!selectedFile) {
+            showToast('Ошибка', 'Выберите видео файл', 'error');
+            return;
+        }
+    }
+    
+    showToast('📤 Отправка', 'Загружается...', 'info');
+    
+    const submission = {
+        id: subId,
+        nick: currentUser.nick,
+        weapon: weapon,
+        opponent: opponent,
+        status: 'pending',
+        ts: Date.now(),
+        mode: uploadMode,
+        videoUrl: uploadMode === 'youtube' ? videoUrl : null,
+        fileName: uploadMode === 'file' ? selectedFile?.name : null
+    };
+    
+    DB.submissions.push(submission);
+    currentUser.videos++;
+    saveData();
+    
+    document.getElementById('pending-status').innerHTML = `
+        <div class="pending-card">
+            <div class="spinner"></div>
+            <div>
+                <strong>⏳ На проверке</strong>
+                <div style="font-size:11px;color:var(--text2);margin-top:2px;">ID: ${subId}</div>
+                ${uploadMode === 'youtube' ? '<div style="font-size:10px;">🔗 ' + videoUrl.slice(0, 30) + '...</div>' : ''}
+            </div>
+        </div>
+    `;
+    
+    showToast('✅ Отправлено!', 'Заявка на проверке', 'success');
+}
+
+// ============================================================
+//  ПРОФИЛЬ
+// ============================================================
+function renderProfile() {
+    if (!currentUser) return;
+    const u = currentUser;
+    
+    const tier = getTier(u.elo, u);
+    const prog = getProgress(u.elo, u);
+    
+    let tierDisplay = tier;
+    if (u.forceTier) tierDisplay = u.forceTier + ' (⚡)';
+    
+    document.getElementById('profile-tier-badge').textContent = tierDisplay;
+    document.getElementById('profile-tier-badge').style.background = `linear-gradient(135deg, ${getTierColor(tier)}, #aa2222)`;
+    
+    document.getElementById('stat-elo').textContent = u.elo;
+    document.getElementById('stat-wins').textContent = u.wins;
+    document.getElementById('stat-videos').textContent = u.videos;
+    document.getElementById('stat-streak').textContent = u.streak || 0;
+    
+    document.getElementById('rank-progress').style.width = prog.pct + '%';
+    document.getElementById('rank-from').textContent = prog.from;
+    document.getElementById('rank-to').textContent = prog.to;
+    
+    const subs = DB.submissions.filter(s => s.nick === u.nick).reverse();
+    const hist = document.getElementById('history-list');
+    
+    if (!subs.length) {
+        hist.innerHTML = '<div class="text-center text-muted">Нет заявок</div>';
+    } else {
+        hist.innerHTML = subs.map(s => {
+            const statusColor = s.status === 'approved' ? 'var(--success)' : 
+                              s.status === 'rejected' ? 'var(--danger)' : 'var(--gold)';
+            const videoInfo = s.mode === 'youtube' ? 
+                `<a href="${s.videoUrl}" target="_blank" style="color:var(--accent);">▶️ YouTube</a>` : 
+                `📹 ${s.fileName || 'Видео'}`;
+            
+            return `
+                <div class="sub-item" style="border-left: 3px solid ${statusColor};">
+                    <div class="sub-item-head">
+                        <span>${s.weapon} ${s.opponent ? 'vs ' + s.opponent : ''}</span>
+                        <span style="color:${statusColor};">${s.status === 'pending' ? '⏳' : s.status === 'approved' ? '✅' : '❌'}</span>
+                    </div>
+                    <div style="font-size:11px; color:var(--text2);">${videoInfo}</div>
+                    <div style="font-size:10px; color:var(--text3);">${new Date(s.ts).toLocaleString()}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Достижения (упрощенно)
+    const achievements = [
+        { id: 'first', icon: '🏆', name: 'Первая победа', cond: u.wins >= 1 },
+        { id: 'streak3', icon: '🔥', name: 'Серия 3', cond: u.streak >= 3 },
+        { id: 'videos5', icon: '🎥', name: '5 видео', cond: u.videos >= 5 },
+        { id: 'elo2000', icon: '💎', name: 'ELO 2000', cond: u.elo >= 2000 }
+    ];
+    
+    document.getElementById('achievements-grid').innerHTML = achievements.map(a => `
+        <div class="ach-item ${a.cond ? 'unlocked' : ''}">
+            <div class="ach-icon">${a.icon}</div>
+            <div class="ach-name">${a.name}</div>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+//  ЛИДЕРБОРД
+// ============================================================
+function setLbFilter(f) { lbFilter = f; renderLeaderboard(); }
+
+function renderLeaderboard() {
+    const q = document.getElementById('lb-search')?.value.toLowerCase() || '';
+    let users = Object.values(DB.users).sort((a, b) => b.elo - a.elo);
+    if (lbFilter !== 'all') users = users.filter(u => u.weapon === lbFilter);
+    if (q) users = users.filter(u => u.nick.toLowerCase().includes(q));
+
+    const list = document.getElementById('leaderboard-list');
+    if (!users.length) { list.innerHTML = '<div class="text-center text-muted">Игроки не найдены</div>'; return; }
+
+    const medals = ['🥇', '🥈', '🥉'];
+    list.innerHTML = users.map((u, i) => {
+        const tier = getTier(u.elo, u);
+        const tierColor = getTierColor(tier);
+        const forceBadge = u.forceTier ? '⚡' : '';
+        
+        return `
+            <div class="lb-item lb-rank-${i < 3 ? i + 1 : ''}" onclick="showPlayerProfile('${u.nick}')">
+                <div class="lb-pos">${i < 3 ? medals[i] : '#' + (i + 1)}</div>
+                <img class="lb-avatar" src="https://mc-heads.net/avatar/${u.nick}/32" alt="">
+                <div class="lb-info">
+                    <div class="lb-nick">${u.nick} ${forceBadge}</div>
+                    <div class="lb-sub" style="color:${tierColor};">${tier}</div>
+                </div>
+                <div class="lb-elo" style="color:${tierColor};">${u.elo}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function showPlayerProfile(nick) {
+    const user = DB.users[nick];
+    if (!user) return;
+    
+    alert(`${nick}\nELO: ${user.elo}\nПобед: ${user.wins}\nТир: ${getTier(user.elo, user)}`);
+}
+
+// ============================================================
+//  АДМИН ПАНЕЛЬ
+// ============================================================
+function renderAdminPanel() {
+    if (!currentUser?.admin) return;
+    
+    document.getElementById('admin-total').textContent = Object.keys(DB.users).length;
+    document.getElementById('admin-pending').textContent = DB.submissions.filter(s => s.status === 'pending').length;
+    document.getElementById('admin-approved').textContent = DB.submissions.filter(s => s.status === 'approved').length;
+    document.getElementById('admin-rejected').textContent = DB.submissions.filter(s => s.status === 'rejected').length;
+    
+    const pendingSubs = DB.submissions.filter(s => s.status === 'pending');
+    const subsEl = document.getElementById('admin-submissions');
+    
+    if (!pendingSubs.length) {
+        subsEl.innerHTML = '<div class="text-center text-muted">Нет заявок на проверке</div>';
+    } else {
+        subsEl.innerHTML = pendingSubs.map(s => {
+            return `
+                <div class="sub-item" style="margin-bottom:16px;">
+                    <div class="sub-item-head">
+                        <strong>${s.nick}</strong>
+                        <span>⚔️ ${s.weapon} ${s.opponent ? 'vs ' + s.opponent : ''}</span>
+                    </div>
+                    
+                    ${s.mode === 'youtube' ? 
+                        `<div style="margin:8px 0;">
+                            <a href="${s.videoUrl}" target="_blank" style="color:var(--accent);">▶️ Смотреть на YouTube</a>
+                        </div>` : 
+                        `<div style="font-size:12px; color:var(--text2);">📹 ${s.fileName || 'Видео файл'}</div>`
+                    }
+                    
+                    <div style="font-size:11px; color:var(--text3); margin-bottom:8px;">
+                        ${new Date(s.ts).toLocaleString()}
+                    </div>
+                    
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <select id="tier-select-${s.id}" style="flex:2; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px; color:var(--text);">
+                            <option value="">🎯 Назначить тир (опционально)</option>
+                            <option value="HT1">HT1 (3000+)</option>
+                            <option value="HT2">HT2 (2700-2999)</option>
+                            <option value="HT3">HT3 (2400-2699)</option>
+                            <option value="LT1">LT1 (2100-2399)</option>
+                            <option value="LT2">LT2 (1800-2099)</option>
+                            <option value="LT3">LT3 (1500-1799)</option>
+                            <option value="LT4">LT4 (1200-1499)</option>
+                            <option value="LT5">LT5 (900-1199)</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-primary btn-sm" style="flex:1; padding:10px;" onclick="adminApprove('${s.id}')">✅ Принять (+50)</button>
+                        <button class="btn btn-danger btn-sm" style="flex:1; padding:10px;" onclick="adminReject('${s.id}')">❌ Отклонить</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Управление тирами
+    const allUsers = Object.values(DB.users).sort((a, b) => b.elo - a.elo);
+    const tierMgmt = document.getElementById('tier-management');
+    tierMgmt.innerHTML = allUsers.map(u => {
+        const currentTier = getTier(u.elo, u);
+        const forced = u.forceTier ? ` (принудительно ${u.forceTier})` : '';
+        
+        return `
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; background:var(--bg2); padding:10px; border-radius:10px;">
+                <img src="https://mc-heads.net/avatar/${u.nick}/24" style="width:24px; height:24px; border-radius:6px;">
+                <div style="flex:1;">
+                    <div><strong>${u.nick}</strong> <span style="color:${getTierColor(currentTier)};">${currentTier}${forced}</span></div>
+                    <div style="font-size:10px;">${u.elo} ELO · ${u.wins} побед</div>
+                </div>
+                <select onchange="setPlayerTier('${u.nick}', this.value)" style="background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:4px; color:var(--text);">
+                    <option value="">Авто</option>
+                    <option value="HT1" ${u.forceTier === 'HT1' ? 'selected' : ''}>HT1</option>
+                    <option value="HT2" ${u.forceTier === 'HT2' ? 'selected' : ''}>HT2</option>
+                    <option value="HT3" ${u.forceTier === 'HT3' ? 'selected' : ''}>HT3</option>
+                    <option value="LT1" ${u.forceTier === 'LT1' ? 'selected' : ''}>LT1</option>
+                    <option value="LT2" ${u.forceTier === 'LT2' ? 'selected' : ''}>LT2</option>
+                    <option value="LT3" ${u.forceTier === 'LT3' ? 'selected' : ''}>LT3</option>
+                    <option value="LT4" ${u.forceTier === 'LT4' ? 'selected' : ''}>LT4</option>
+                    <option value="LT5" ${u.forceTier === 'LT5' ? 'selected' : ''}>LT5</option>
+                </select>
+                <button class="btn btn-danger btn-sm" style="padding:4px 8px;" onclick="clearPlayerTier('${u.nick}')">✕</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function setPlayerTier(nick, tier) {
+    const user = DB.users[nick];
+    if (!user) return;
+    user.forceTier = tier || null;
+    saveData();
+    showToast('✅ Тир обновлен', `${nick} теперь ${tier || 'авто'}`, 'success');
+    renderAdminPanel();
+    if (currentUser?.nick === nick) renderProfile();
+    renderLeaderboard();
+}
+
+function clearPlayerTier(nick) {
+    const user = DB.users[nick];
+    if (!user) return;
+    user.forceTier = null;
+    saveData();
+    showToast('🔄 Сброшено', `${nick} вернулся к авто-тиру`, 'info');
+    renderAdminPanel();
+    renderLeaderboard();
+}
+
+function adminApprove(subId) {
+    const sub = DB.submissions.find(s => s.id === subId);
+    if (!sub) return;
+    
+    sub.status = 'approved';
+    const user = DB.users[sub.nick];
+    
+    if (user) {
+        user.elo += 50;
+        user.wins++;
+        user.streak = (user.streak || 0) + 1;
+        
+        const tierSelect = document.getElementById('tier-select-' + subId);
+        if (tierSelect && tierSelect.value) {
+            user.forceTier = tierSelect.value;
+        }
+    }
+    
+    saveData();
+    showToast('✅ Принято', sub.nick + ' +50 ELO', 'success');
+    renderAdminPanel();
+    renderLeaderboard();
+}
+
+function adminReject(subId) {
+    const sub = DB.submissions.find(s => s.id === subId);
+    if (!sub) return;
+    
+    sub.status = 'rejected';
+    const user = DB.users[sub.nick];
+    if (user) user.streak = 0;
+    
+    saveData();
+    showToast('❌ Отклонено', sub.nick, 'error');
+    renderAdminPanel();
+}
+
+function adminChangeElo() {
+    const nick = document.getElementById('admin-nick').value.trim();
+    const delta = parseInt(document.getElementById('admin-elo').value);
+    
+    if (!nick || isNaN(delta)) {
+        showToast('Ошибка', 'Заполните поля', 'error');
+        return;
+    }
+    
+    const user = DB.users[nick];
+    if (!user) {
+        showToast('Ошибка', 'Игрок не найден', 'error');
+        return;
+    }
+    
+    user.elo = Math.max(0, user.elo + delta);
+    saveData();
+    showToast('✅ Изменено', `${nick}: ${delta > 0 ? '+' : ''}${delta} ELO`, 'success');
+    renderAdminPanel();
+    renderLeaderboard();
+}
+
+function adminSendTestEmail() {
+    showToast('📧 Отправлено', 'Тестовое уведомление', 'info');
+}
+
+function adminAddEvent() {
+    const title = document.getElementById('admin-event-title').value.trim();
+    const status = document.getElementById('admin-event-status').value;
+    if (!title) { showToast('Ошибка', 'Введи название', 'error'); return; }
+    DB.events.unshift({ id: 'e_' + Date.now(), title, status, desc: 'Новый ивент', date: 'TBD', prizes: [] });
+    saveData();
+    showToast('🔥 Ивент добавлен', title, 'success');
+    document.getElementById('admin-event-title').value = '';
+    renderUnstable();
+}
+
+// ============================================================
+//  UNSTABLE SMP
+// ============================================================
+function renderUnstable() {
+    document.getElementById('smp-online').textContent = Math.floor(Math.random() * 50) + 100;
+    document.getElementById('smp-events').textContent = DB.events.filter(e => e.status !== 'ended').length;
+    
+    const el = document.getElementById('events-list');
+    el.innerHTML = DB.events.map(e => {
+        const badgeClass = e.status === 'live' ? 'badge-live' : e.status === 'soon' ? 'badge-soon' : 'badge-ended';
+        const badgeText = e.status === 'live' ? '🔴 LIVE' : e.status === 'soon' ? '🟡 СКОРО' : '⚫ ЗАВЕРШЁН';
+        const prizes = e.prizes.map(p => '<span class="prize-tag">🏆 ' + p + '</span>').join('');
+        
+        return `
+            <div class="event-card">
+                <div class="event-head">
+                    <div class="event-title">${e.title}</div>
+                    <span class="event-badge ${badgeClass}">${badgeText}</span>
+                </div>
+                <div class="event-info">${e.desc}<br>📅 ${e.date}</div>
+                <div class="event-prizes">${prizes}</div>
+            </div>
+        `;
+    }).join('');
+    
+    const smpTop = Object.values(DB.users).filter(u => u.smpMember).sort((a, b) => b.elo - a.elo).slice(0, 5);
+    document.getElementById('unstable-top').innerHTML = smpTop.map((u, i) => `
+        <div class="lb-item" style="margin-bottom:6px;">
+            <div class="lb-pos" style="color:var(--accent);">#${i + 1}</div>
+            <img class="lb-avatar" src="https://mc-heads.net/avatar/${u.nick}/32" alt="">
+            <div class="lb-info"><div class="lb-nick">${u.nick}</div></div>
+            <div class="lb-elo" style="color:var(--accent);">${u.elo}</div>
+        </div>
+    `).join('');
+}
+
+function joinSMP() {
+    if (!currentUser) { showToast('Нужен аккаунт', 'Сначала войди', 'warning'); showTab('login'); return; }
+    if (currentUser.smpMember) { showToast('Уже участник!', 'Ты уже в Unstable SMP', 'info'); return; }
+    currentUser.smpMember = true;
+    if (!DB.smpMembers.includes(currentUser.nick)) DB.smpMembers.push(currentUser.nick);
+    saveData();
+    showToast('🔥 Добро пожаловать!', 'Ты теперь в Unstable SMP!', 'success');
+    renderUnstable();
+}
+
+// ============================================================
+//  SKINS (упрощенно)
+// ============================================================
+function renderSkins() {
+    if (!currentUser) return;
+    document.getElementById('skin-preview-full').src = 'https://mc-heads.net/body/' + currentUser.nick + '/64';
+    
+    const skins = [
+        { id: 'ht1', name: 'HT1 Champion', nick: 'Notch', req: 'ELO 3000', unlocked: currentUser.elo >= 3000 },
+        { id: 'ht2', name: 'HT2 Warrior', nick: 'Dream', req: 'ELO 2700', unlocked: currentUser.elo >= 2700 },
+        { id: 'smp', name: 'SMP Member', nick: 'Technoblade', req: 'SMP', unlocked: currentUser.smpMember }
+    ];
+    
+    document.getElementById('reward-skins').innerHTML = skins.map(s => `
+        <div class="skin-item ${s.unlocked ? 'unlocked' : ''} ${currentUser.activeSkin === s.id ? 'active' : ''}" 
+             ${s.unlocked ? 'onclick="selectSkin(\'' + s.id + '\')"' : ''}>
+            <img class="skin-img" src="https://mc-heads.net/avatar/${s.nick}/48" alt="">
+            <div class="skin-name">${s.unlocked ? s.name : '🔒 ' + s.req}</div>
+        </div>
+    `).join('');
+}
+
+function selectSkin(id) {
+    if (!currentUser) return;
+    currentUser.activeSkin = id;
+    saveData();
+    renderSkins();
+    showToast('🎨 Скин выбран!', 'Наградной скин активирован', 'success');
+}
+
+function refreshSkin() {
+    if (!currentUser) return;
+    document.getElementById('skin-preview-full').src = 'https://mc-heads.net/body/' + currentUser.nick + '/64?t=' + Date.now();
+    showToast('✅ Скин обновлён!', 'Синхронизация завершена', 'success');
+}
+
+function searchPlayerSkin() {
+    const nick = document.getElementById('skin-search-nick').value.trim();
+    if (!nick) return;
+    const res = document.getElementById('skin-search-result');
+    const user = DB.users[nick];
+    const tier = user ? getTier(user.elo, user) : null;
+    
+    res.innerHTML = `
+        <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;">
+            <img src="https://mc-heads.net/avatar/${nick}/48" style="width:48px;height:48px;border-radius:10px;">
+            <div>
+                <div style="font-weight:700;">${nick}</div>
+                ${user ? `<div style="color:${getTierColor(tier)};">${user.elo} ELO · ${tier}</div>` : '<div style="color:var(--text2);">Не зарегистрирован</div>'}
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+if (tg?.initDataUnsafe?.user?.username) {
+    const regNick = document.getElementById('reg-nick');
+    if (regNick) regNick.value = tg.initDataUnsafe.user.username;
+}
+
+renderLeaderboard();
+renderUnstable();
+</script>
 </body>
-</html>
+    </html>
